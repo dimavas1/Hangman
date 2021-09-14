@@ -16,7 +16,8 @@ namespace Hangman
             int wordIndex;
             string selectedWord;
             ConsoleKeyInfo key;
-            bool isEqual;
+            bool letterExist;
+            int trialCounter;
             
             Random rnd = new();
 
@@ -25,7 +26,7 @@ namespace Hangman
             do
             {
                 List<char> selectedLetters = new();
-
+                trialCounter = 0;
                 wordIndex = rnd.Next(0, countWords);
                 selectedWord = wordList[wordIndex];
                 newList = GenerateEmptyList(selectedWord.Length);
@@ -35,7 +36,7 @@ namespace Hangman
 
                 for (i = 0; i < numberOfTry; i++)
                 {
-                    isEqual = true;
+                    letterExist = true;
                     Console.WriteLine("\nSelect letter");
                     key = Console.ReadKey();
 
@@ -52,21 +53,23 @@ namespace Hangman
                         selectedLetters.Add(key.KeyChar);
                     }
 
+                    trialCounter++;
                     newList = UpdateList(key, selectedWord, newList);
 
-                    foreach (var item in newList)
+                    foreach (var letter in newList)
                     {
-                        if (!previousList.Contains(item))
+                        if (!previousList.Contains(letter))
                         {
                             previousList = UpdateList(key, selectedWord, previousList);
-                            isEqual = false;
+                            letterExist = false;
                             i--;
+                            trialCounter--;
                             break;
                         }
 
                     }
 
-                    if (!isEqual)
+                    if (!letterExist)
                     {
                         PrintList(previousList, "\nThis letter exist");
 
@@ -83,17 +86,22 @@ namespace Hangman
 
                 }
 
-                if (i == numberOfTry)
+                if (trialCounter == numberOfTry)
                 {
                     Console.WriteLine("You Lose!");
                 }
 
-                Console.WriteLine("Do you Want to play another round? y/n");
+                Console.WriteLine("Do you want to play another round? y/n");
                 continueToPlay = Console.ReadKey().KeyChar;
             } while (continueToPlay == 'y');
 
         }
 
+        /// <summary>
+        /// Generate new list where each item is '_'
+        /// </summary>
+        /// <param name="numberOfLetters"> represen number of items to create </param>
+        /// <returns>List</returns>
         static List<char> GenerateEmptyList(int numberOfLetters)
         {
             List<char> list = new();
@@ -105,6 +113,16 @@ namespace Hangman
 
             return list;
         }
+        
+        /// <summary>
+        /// Scanning the list for selected char.
+        /// If this char not exist updating the list with new char item.
+        /// </summary>
+        /// <param name="letter">Key info sent from user</param>
+        /// <param name="selectedWord">selected word to guess on</param>
+        /// <param name="currentList">list with guessed items</param>
+        /// <returns>updated list if the letter not exist 
+        /// other way return the list without changes</returns>
         static List<char> UpdateList(ConsoleKeyInfo letter, string selectedWord, List<char> currentList)
         {
 
@@ -120,6 +138,12 @@ namespace Hangman
 
             return list;
         }
+        
+        /// <summary>
+        /// Adding atached comments and Combain list items into one string  and printing output
+        /// </summary>
+        /// <param name="list">selected list to combain</param>
+        /// <param name="previousComments">additional coments to print before list</param>
         static void PrintList(List<char> list, string previousComments)
         {
             Console.Clear();
