@@ -36,7 +36,7 @@ namespace Hangman
 
                 for (i = 0; i < numberOfTry; i++)
                 {
-                    letterExist = true;
+                   
                     Console.WriteLine("\nSelect letter");
                     key = Console.ReadKey();
 
@@ -54,19 +54,15 @@ namespace Hangman
                     }
 
                     trialCounter++;
+                    letterExist = true;
                     newList = UpdateList(key, selectedWord, newList);
 
-                    foreach (var letter in newList)
+                    if (!ListsAreEqual(newList,previousList))
                     {
-                        if (!previousList.Contains(letter))
-                        {
-                            previousList = UpdateList(key, selectedWord, previousList);
-                            letterExist = false;
-                            i--;
-                            trialCounter--;
-                            break;
-                        }
-
+                        previousList = UpdateList(key, selectedWord, previousList);
+                        letterExist = false;
+                        i--;
+                        trialCounter--;
                     }
 
                     if (!letterExist)
@@ -140,7 +136,7 @@ namespace Hangman
         }
         
         /// <summary>
-        /// Adding atached comments and Combain list items into one string  and printing output
+        /// Adding atached comments, combain list items into one string  and printing output
         /// </summary>
         /// <param name="list">selected list to combain</param>
         /// <param name="previousComments">additional coments to print before list</param>
@@ -149,6 +145,29 @@ namespace Hangman
             Console.Clear();
             Console.WriteLine(previousComments +"\n");
             Console.WriteLine(string.Join(" ", list));
+        }
+
+        /// <summary>
+        /// Compare 2 lists
+        /// </summary>
+        /// <param name="newList">first list</param>
+        /// <param name="previousList">second list</param>
+        /// <returns>True if equal False if not</returns>
+        static bool ListsAreEqual(List<char> newList, List<char> previousList)
+        {
+            bool letterExist = true;
+
+            foreach (var letter in newList)
+            {
+                if (!previousList.Contains(letter))
+                {
+                    letterExist = false;
+                    break;
+                }
+
+            }
+
+            return letterExist;
         }
     }
 }
